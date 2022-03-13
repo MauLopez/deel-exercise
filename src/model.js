@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize')
+const { Op } = Sequelize
 const _ = require('lodash')
 const { PROFILE_TYPE, CONTRACT_STATUS } = require('./lib/constant')
 
@@ -82,6 +83,15 @@ Contract.init(
         }
 
         return {where}
+      },
+      byContractStatuses: (statuses) => {
+        return {
+          where: {
+            status: {
+              [Op.in]: statuses
+            }
+          }
+        }
       }
     }
   }

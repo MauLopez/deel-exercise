@@ -4,7 +4,7 @@ const request = require('supertest')
 
 const startServer = require('../../utils/start_server')
 
-describe('Contract - Get by id', () => {
+describe('Contract Handler - Get by id', () => {
   let contract, app
   before(async () => {
     app = await startServer()
