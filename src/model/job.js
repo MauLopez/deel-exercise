@@ -50,24 +50,24 @@ class Job extends Sequelize.Model {
 
     const {
       Contract: {
-        Client,
-        Contractor
+        Client: client,
+        Contractor: contractor
       }
     } = job
 
-    if (job.price > Client.balance) {
+    if (job.price > client.balance) {
       throw new Error('Insufficient funds')
     }
 
-    // Deduce job from client balance
     const transaction = await Job.sequelize.transaction()
     try {
-      Client.balance -= job.price
-      await Client.save({transaction})
+      // Deduce job from client balance
+      client.balance -= job.price
+      await client.save({transaction})
 
       // Topup contractor balance
-      Contractor.balance += job.price
-      await Contractor.save({transaction})
+      contractor.balance += job.price
+      await contractor.save({transaction})
 
       // Set job as paid
       job.paid = true

@@ -49,6 +49,74 @@ class Profile extends Sequelize.Model {
     Profile.hasMany(Contract, {as: 'Contractor', foreignKey: 'ContractorId'})
     Profile.hasMany(Contract, {as: 'Client', foreignKey: 'ClientId'})
   }
+
+  async getUnpaidJobBalance () {
+    const profile = this
+    const { Job } = Profile.sequelize.models
+    const unpaidContracts = await Job
+      .findAll({
+        where: {
+          paid: false
+        },
+        include: [{
+          association: 'Contract',
+          where: {
+            ClientId: profile.id
+          }
+        }]
+      })
+
+    return unpaidContracts.reduce((acum, c) => {
+      return acum + c.price
+    }, 0)
+  }
+
+  async deposit (amount, userId) {
+    const profile = this
+
+    if (amount > profile.balance) {
+      throw new Error('Insufficient funds')
+    }
+
+    const profileTarget = await Profile.findOne({
+      where: {
+        id: userId,
+        type: PROFILE_TYPE.CLIENT
+      }
+    })
+
+    if (!profileTarget) {
+      throw new Error('Client not found')
+    }
+
+    // On the readme doesn't say if the contractor can send money or not, I am assuming it can and the 25% validation is only used for clients
+    if (profile.type === PROFILE_TYPE.CLIENT) {
+      const totalUnpaidAmount = await profile.getUnpaidJobBalance()
+
+      if (
+        totalUnpaidAmount && // Validates the user has unpaid jobs before validatiing the 25% exceeds rule
+        (totalUnpaidAmount * 0.25) > amount // 25% of the unpaid jobs are higher than the desired amount to be transferred
+      ) {
+        throw new Error('The amount selected is above the 25% of the unpaid jobs')
+      }
+    }
+
+    const transaction = await Profile.sequelize.transaction()
+    try {
+      // Deduce balance from source
+      profile.balance -= amount
+      await profile.save({transaction})
+
+      // Topup balance on target
+      profileTarget.balance += amount
+      await profileTarget.save({transaction})
+
+      await transaction.commit()
+    } catch (e) {
+      await transaction.rollback()
+      throw new Error('Something went wrong')
+    }
+  }
 }
 
 module.exports = Profile
