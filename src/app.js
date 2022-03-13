@@ -1,8 +1,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const {sequelize} = require('./model')
-const { getProfile, getJob, getContract } = require('./middleware')
-const { CONTRACT_STATUS } = require('./lib/constant')
+const { getProfile, getJob, getContract, validateProfileType } = require('./middleware')
+const { CONTRACT_STATUS, PROFILE_TYPE } = require('./lib/constant')
 const app = express()
 app.use(bodyParser.json())
 app.set('sequelize', sequelize)
@@ -51,7 +51,7 @@ app.get('/jobs/unpaid', getProfile, async (req, res) => {
   res.json({jobs})
 })
 
-app.post('/jobs/:job_id/pay', getProfile, getJob, async (req, res) => {
+app.post('/jobs/:job_id/pay', getProfile, validateProfileType(PROFILE_TYPE.CLIENT), getJob, async (req, res) => {
   const { job } = req
   try {
     await job.pay()

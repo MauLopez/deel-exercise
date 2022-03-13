@@ -65,4 +65,32 @@ describe('Job Handler - Pays a job', () => {
 
     expect(body.message).to.equals('Insufficient funds')
   })
+
+  it('Fails if job does not exist', async () => {
+    await request(app)
+      .post(`/jobs/0/pay`)
+      .set('profile_id', client.id)
+      .expect(404)
+  })
+
+  it('Fails if profile id is not provided', async () => {
+    await request(app)
+      .post(`/jobs/${job.id}/pay`)
+      .expect(401)
+  })
+
+  it('Fails if paying as a contractor', async () => {
+    await request(app)
+      .post(`/jobs/${job.id}/pay`)
+      .set('profile_id', contractor.id)
+      .expect(401)
+  })
+
+  it('Fails if paying as a different client', async () => {
+    const _client = await factory.create('profile', { type: PROFILE_TYPE.CLIENT })
+    await request(app)
+      .post(`/jobs/${job.id}/pay`)
+      .set('profile_id', _client.id)
+      .expect(404)
+  })
 })
