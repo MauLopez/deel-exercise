@@ -116,4 +116,17 @@ describe('Balance Handler - Deposit', () => {
 
     expect(body.message).to.equals('Insufficient funds')
   })
+
+  it('Fails if the amount is not a number', async () => {
+    const currentBalance = 80
+    const amount = 'a'
+    const client = await factory.create('profile', { type: PROFILE_TYPE.CLIENT, balance: currentBalance })
+    const { body } = await request(app)
+      .post(`/balances/deposit/${targetClient.id}`)
+      .set('profile_id', client.id)
+      .send({ amount })
+      .expect(400)
+
+    expect(body.message).to.equals('"amount" must be a number')
+  })
 })

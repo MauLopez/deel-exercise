@@ -1,6 +1,7 @@
-const _ = require('lodash')
 const express = require('express')
 const bodyParser = require('body-parser')
+const Joi = require('joi')
+
 const {sequelize} = require('./model')
 const { getProfile, getJob, getContract, validateProfileType } = require('./middleware')
 const { CONTRACT_STATUS, PROFILE_TYPE } = require('./lib/constant')
@@ -68,10 +69,18 @@ app.post('/jobs/:job_id/pay', getProfile, validateProfileType(PROFILE_TYPE.CLIEN
 app.post('/balances/deposit/:userId', getProfile, async (req, res) => {
   const { profile, body: { amount }, params: { userId } } = req
 
-  // TODO: Improve by using joi to validate it in a middleware
-  if (!_.isNumber(amount) || amount <= 0) {
+  // TODO: Move to a middleware
+  const { error } = Joi
+    .object({
+      amount: Joi.number().positive()
+    })
+    .validate({
+      amount
+    })
+
+  if (error) {
     return res.status(400).json({
-      message: 'Invalid amount'
+      message: error.message
     })
   }
 
