@@ -71,6 +71,18 @@ Contract.init(
 
         return contract
       }
+    },
+    scopes: {
+      byProfileType: (profileType, profileId) => {
+        const where = {}
+        if (profileType === PROFILE_TYPE.CLIENT) {
+          where.ClientId = profileId
+        } else {
+          where.ContractorId = profileId
+        }
+
+        return {where}
+      }
     }
   }
 )
