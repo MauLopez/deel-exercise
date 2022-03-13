@@ -78,7 +78,7 @@ describe('Contract Model', () => {
 
   it('is invalid with an incorrect status', async () => {
     try {
-      const result = await factory.create('contract', { status: 'notexist' })
+      await factory.create('contract', { status: 'notexist' })
       throw new Error('It should fail')
     } catch (e) {
       expect(e.message).to.equals('Contract status not in enum.')
@@ -87,7 +87,7 @@ describe('Contract Model', () => {
 
   it('is invalid without a status', async () => {
     try {
-      const result = await factory.create('contract', { status: null })
+      await factory.create('contract', { status: null })
       throw new Error('It should fail')
     } catch (e) {
       const {
@@ -105,7 +105,7 @@ describe('Contract Model', () => {
 
   it('is invalid without terms', async () => {
     try {
-      const result = await factory.create('contract', { terms: null })
+      await factory.create('contract', { terms: null })
       throw new Error('It should fail')
     } catch (e) {
       const {

@@ -3,7 +3,6 @@ const randomstring = require('randomstring')
 const moment = require('moment')
 const { Job } = require('../../src/model')
 
-
 module.exports = (factory) => {
   factory.define('job', Job, {
     description: randomstring.generate({

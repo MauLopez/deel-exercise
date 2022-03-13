@@ -3,7 +3,6 @@ const randomstring = require('randomstring')
 const { Contract } = require('../../src/model')
 const { CONTRACT_STATUS, PROFILE_TYPE } = require('../../src/lib/constant')
 
-
 module.exports = (factory) => {
   factory.define('contract', Contract, {
     terms: randomstring.generate({

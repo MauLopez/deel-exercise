@@ -26,7 +26,7 @@ describe('Profile Model', () => {
 
   it('is invalid with an incorrect type', async () => {
     try {
-      const result = await factory.create('profile', { type: 'notexist' })
+      await factory.create('profile', { type: 'notexist' })
       throw new Error('It should fail')
     } catch (e) {
       expect(e.message).to.equals('Profile type not in enum.')
@@ -35,7 +35,7 @@ describe('Profile Model', () => {
 
   it('is invalid without a type', async () => {
     try {
-      const result = await factory.create('profile', { type: null })
+      await factory.create('profile', { type: null })
       throw new Error('It should fail')
     } catch (e) {
       const {

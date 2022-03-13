@@ -3,7 +3,6 @@ const randomstring = require('randomstring')
 const { Profile } = require('../../src/model')
 const { PROFILE_TYPE } = require('../../src/lib/constant')
 
-
 module.exports = (factory) => {
   factory.define('profile', Profile, {
     firstName: randomstring.generate({
