@@ -38,4 +38,23 @@ app.get('/contracts', getProfile, async (req, res) => {
   res.json({contracts})
 })
 
+app.get('/jobs/unpaid', getProfile, async (req, res) => {
+  const { Job, Contract } = req.app.get('models')
+  const { profile } = req
+  const jobs = await Job
+    .findAll({
+      where: {
+        paid: false
+      },
+      include: [{
+        model: Contract
+          .scope(
+            { method: ['byContractStatuses', [CONTRACT_STATUS.NEW, CONTRACT_STATUS.IN_PROGRESS]] },
+            { method: ['byProfileType', profile.type, profile.id]}
+          )
+      }]
+    })
+  res.json({jobs})
+})
+
 module.exports = app
