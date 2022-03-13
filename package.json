@@ -27,6 +27,7 @@
     "mocha": "^9.2.2",
     "nodemon": "1.19.1",
     "randomstring": "^1.2.2",
+    "sinon": "^13.0.1",
     "supertest": "^6.2.2"
   },
   "engines": {

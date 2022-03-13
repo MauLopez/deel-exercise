@@ -52,8 +52,15 @@ app.get('/jobs/unpaid', getProfile, async (req, res) => {
 })
 
 app.post('/jobs/:job_id/pay', getProfile, getJob, async (req, res) => {
-  const { job } = req.job
-  await job.pay()
+  const { job } = req
+  try {
+    await job.pay()
+    res.json({job})
+  } catch (e) {
+    return res.status(400).json({
+      message: e.message
+    })
+  }
 })
 
 module.exports = app
