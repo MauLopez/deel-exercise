@@ -52,7 +52,8 @@ app.get('/jobs/unpaid', getProfile, async (req, res) => {
 })
 
 app.post('/jobs/:job_id/pay', getProfile, getJob, async (req, res) => {
-
+  const { job } = req.job
+  await job.pay()
 })
 
 module.exports = app
