@@ -20,36 +20,42 @@ class Contract extends Sequelize.Model {
         sequelize,
         modelName: 'Contract',
         hooks: {
-          afterValidate: (contract) => {
-            // SQLite doesn't allow enum validations
-            if (!_.includes(Object.values(CONTRACT_STATUS), contract.status)) {
-              throw new Error('Contract status not in enum.')
-            }
-            return contract
-          }
+          afterValidate: Contract.afterValidate
         },
         scopes: {
-          byProfileType: (profileType, profileId) => {
-            const where = {}
-            if (profileType === PROFILE_TYPE.CLIENT) {
-              where.ClientId = profileId
-            } else {
-              where.ContractorId = profileId
-            }
-            return {where}
-          },
-          byContractStatuses: (statuses) => {
-            return {
-              where: {
-                status: {
-                  [Op.in]: statuses
-                }
-              }
-            }
-          }
+          byProfileType: Contract.scopeByProfileType,
+          byContractStatuses: Contract.scopeByContractStatuses
         }
       }
     )
+  }
+
+  static scopeByProfileType (profileType, profileId) {
+    const where = {}
+    if (profileType === PROFILE_TYPE.CLIENT) {
+      where.ClientId = profileId
+    } else {
+      where.ContractorId = profileId
+    }
+    return {where}
+  }
+
+  static scopeByContractStatuses (statuses) {
+    return {
+      where: {
+        status: {
+          [Op.in]: statuses
+        }
+      }
+    }
+  }
+
+  static afterValidate (contract) {
+    // SQLite doesn't allow enum validations
+    if (!_.includes(Object.values(CONTRACT_STATUS), contract.status)) {
+      throw new Error('Contract status not in enum.')
+    }
+    return contract
   }
 
   static associate (models) {

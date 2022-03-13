@@ -30,16 +30,18 @@ class Profile extends Sequelize.Model {
         sequelize,
         modelName: 'Profile',
         hooks: {
-          afterValidate: (profile) => {
-            // SQLite doesn't allow enum validations
-            if (!_.includes(Object.values(PROFILE_TYPE), profile.type)) {
-              throw new Error('Profile type not in enum.')
-            }
-            return profile
-          }
+          afterValidate: Profile.afterValidate
         }
       }
     )
+  }
+
+  static afterValidate (profile) {
+    // SQLite doesn't allow enum validations
+    if (!_.includes(Object.values(PROFILE_TYPE), profile.type)) {
+      throw new Error('Profile type not in enum.')
+    }
+    return profile
   }
 
   static associate (models) {
