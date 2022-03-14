@@ -1,7 +1,5 @@
 # DEEL BACKEND TASK
 
-  
-
 💫 Welcome! 🎉
 
 
@@ -124,3 +122,10 @@ When you have finished the assignment, create a github repository and send us th
   
 
 Thank you and good luck! 🙏
+
+## Pending tasks
+- Add middleware to validate with Joi all the request (query string parameters, path parameters and body)
+- Add error handler to properly track error code
+- Add swagger apidoc
+- Split databases (creating a new one for test instead of replacing the seeded one)
+- Use .dotenv to manage the environments
