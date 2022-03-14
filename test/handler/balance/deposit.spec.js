@@ -129,4 +129,29 @@ describe('Balance Handler - Deposit', () => {
 
     expect(body.message).to.equals('"amount" must be a number')
   })
+
+  it('Fails if the amount is negative', async () => {
+    const currentBalance = 80
+    const amount = -1
+    const client = await factory.create('profile', { type: PROFILE_TYPE.CLIENT, balance: currentBalance })
+    const { body } = await request(app)
+      .post(`/balances/deposit/${targetClient.id}`)
+      .set('profile_id', client.id)
+      .send({ amount })
+      .expect(400)
+
+    expect(body.message).to.equals('"amount" must be a positive number')
+  })
+
+  it('Fails if the amount is not provided', async () => {
+    const currentBalance = 80
+    const client = await factory.create('profile', { type: PROFILE_TYPE.CLIENT, balance: currentBalance })
+    const { body } = await request(app)
+      .post(`/balances/deposit/${targetClient.id}`)
+      .set('profile_id', client.id)
+      .send({})
+      .expect(400)
+
+    expect(body.message).to.equals('"amount" is required')
+  })
 })

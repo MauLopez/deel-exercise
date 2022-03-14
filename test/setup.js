@@ -1,12 +1,11 @@
 const factories = require('./factory')
+const cleanDB = require('./utils/clean_db')
 const {sequelize} = require('../src/model')
 
 before(async() => {
   try {
     factories()
-    for (const model in sequelize.models) {
-      await sequelize.models[model].truncate({cascade: true})
-    }
+    await cleanDB()
   } catch (error) {
     throw error
   }

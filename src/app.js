@@ -1,7 +1,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const Joi = require('joi')
-
+const Sequelize = require('sequelize')
+const { Op } = Sequelize
 const {sequelize} = require('./model')
 const { getProfile, getJob, getContract, validateProfileType } = require('./middleware')
 const { CONTRACT_STATUS, PROFILE_TYPE } = require('./lib/constant')
@@ -72,7 +73,7 @@ app.post('/balances/deposit/:userId', getProfile, async (req, res) => {
   // TODO: Move to a middleware
   const { error } = Joi
     .object({
-      amount: Joi.number().positive()
+      amount: Joi.number().positive().required()
     })
     .validate({
       amount
@@ -92,6 +93,58 @@ app.post('/balances/deposit/:userId', getProfile, async (req, res) => {
       message: e.message
     })
   }
+})
+
+app.get('/admin/best-profession', getProfile, async (req, res) => {
+  const {
+    query: {
+      start, end
+    }
+  } = req
+  const { Job } = req.app.get('models')
+
+  // TODO: Move to a middleware
+  const { error } = Joi
+    .object({
+      start: Joi.date().optional(),
+      end: Joi.date().optional()
+    })
+    .validate({
+      start, end
+    })
+
+  if (error) {
+    return res.status(400).json({
+      message: error.message
+    })
+  }
+
+  const dates = []
+  if (start) dates.push({paymentDate: { [Op.gte]: start }})
+  if (end) dates.push({paymentDate: { [Op.lte]: end }})
+  const query = {
+    paid: true,
+    [Op.and]: dates
+  }
+
+  const job = await Job.findOne({
+    where: query,
+    include: [{
+      association: 'Contract',
+      include: [{
+        association: 'Contractor'
+      }],
+      attributes: []
+    }],
+    group: 'Contract.Contractor.profession',
+    attributes: [
+      [sequelize.fn('sum', sequelize.col('price')), 'amount'],
+      [sequelize.col('Contract.Contractor.profession'), 'profession']
+    ],
+    order: [[sequelize.col('amount'), 'DESC']]
+  })
+
+  res.json({job})
 })
 
 module.exports = app
