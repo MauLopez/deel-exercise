@@ -96,22 +96,16 @@ app.post('/balances/deposit/:userId', getProfile, async (req, res) => {
 })
 
 app.get('/admin/best-profession', getProfile, async (req, res) => {
-  const {
-    query: {
-      start, end
-    }
-  } = req
+  const { query } = req
   const { Job } = req.app.get('models')
 
   // TODO: Move to a middleware
-  const { error } = Joi
+  const { error, value } = Joi
     .object({
       start: Joi.date().optional(),
       end: Joi.date().optional()
     })
-    .validate({
-      start, end
-    })
+    .validate(query)
 
   if (error) {
     return res.status(400).json({
@@ -119,16 +113,18 @@ app.get('/admin/best-profession', getProfile, async (req, res) => {
     })
   }
 
+  const { start, end } = value
+
   const dates = []
   if (start) dates.push({paymentDate: { [Op.gte]: start }})
   if (end) dates.push({paymentDate: { [Op.lte]: end }})
-  const query = {
+  const where = {
     paid: true,
     [Op.and]: dates
   }
 
   const job = await Job.findOne({
-    where: query,
+    where,
     include: [{
       association: 'Contract',
       include: [{
@@ -145,6 +141,60 @@ app.get('/admin/best-profession', getProfile, async (req, res) => {
   })
 
   res.json({job})
+})
+
+app.get('/admin/best-clients', getProfile, async (req, res) => {
+  const {
+    query
+  } = req
+  const { Job } = req.app.get('models')
+
+  // TODO: Move to a middleware
+  const { error, value } = Joi
+    .object({
+      start: Joi.date().optional(),
+      end: Joi.date().optional(),
+      limit: Joi.number().optional().default(25)
+    })
+    .validate(query)
+
+  if (error) {
+    return res.status(400).json({
+      message: error.message
+    })
+  }
+
+  const { start, end, limit } = value
+
+  const dates = []
+  if (start) dates.push({paymentDate: { [Op.gte]: start }})
+  if (end) dates.push({paymentDate: { [Op.lte]: end }})
+  const where = {
+    paid: true,
+    [Op.and]: dates
+  }
+
+  const clients = await Job.findAll({
+    where,
+    limit,
+    include: [{
+      association: 'Contract',
+      include: [{
+        association: 'Client'
+      }],
+      attributes: []
+    }],
+    group: 'Contract.Client.id',
+    attributes: [
+      [sequelize.fn('sum', sequelize.col('price')), 'amount'],
+      [sequelize.col('Contract.Client.id'), 'id'],
+      [sequelize.col('Contract.Client.lastName'), 'lastName'],
+      [sequelize.col('Contract.Client.firstName'), 'firstName']
+    ],
+    order: [[sequelize.col('amount'), 'DESC']]
+  })
+
+  res.json({clients})
 })
 
 module.exports = app
