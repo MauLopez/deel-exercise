@@ -14,7 +14,8 @@ class Job extends Sequelize.Model {
         },
         paid: {
           type: Sequelize.BOOLEAN,
-          default: false
+          default: false,
+          allowNull: false
         },
         paymentDate: {
           type: Sequelize.DATE
