@@ -13,16 +13,14 @@ app.set('sequelize', sequelize)
 app.set('models', sequelize.models)
 
 /**
- * @description Get an existing contract by id for a given client or contract
- * @returns Contract by id
+ * @description Gets an existing contract by id for a given client or contract
  */
 app.get('/contracts/:contract_id', getProfile, getContract, async (req, res) => {
   res.json(req.contract)
 })
 
 /**
- * @description Get a list of new and in progress contracts for a given client or contractor
- * @returns List of contracts
+ * @description Gets a list of new and in progress contracts for a given client or contractor
  */
 app.get('/contracts', getProfile, async (req, res) => {
   const { Contract } = req.app.get('models')
@@ -36,6 +34,9 @@ app.get('/contracts', getProfile, async (req, res) => {
   res.json({contracts})
 })
 
+/**
+ * @description Gets a list of unpaid jobs for active contracts
+ */
 app.get('/jobs/unpaid', getProfile, async (req, res) => {
   const { Job, Contract } = req.app.get('models')
   const { profile } = req
@@ -55,6 +56,9 @@ app.get('/jobs/unpaid', getProfile, async (req, res) => {
   res.json({jobs})
 })
 
+/**
+ * @description Pays a job
+ */
 app.post('/jobs/:job_id/pay', getProfile, validateProfileType(PROFILE_TYPE.CLIENT), getJob, async (req, res) => {
   const { job } = req
   try {
@@ -67,6 +71,11 @@ app.post('/jobs/:job_id/pay', getProfile, validateProfileType(PROFILE_TYPE.CLIEN
   }
 })
 
+/**
+ * @description Deposit balance to a given client
+ * @param {Object} body
+ * @param {number} body.amount - Amount to be transferred
+ */
 app.post('/balances/deposit/:userId', getProfile, async (req, res) => {
   const { profile, body: { amount }, params: { userId } } = req
 
@@ -95,6 +104,12 @@ app.post('/balances/deposit/:userId', getProfile, async (req, res) => {
   }
 })
 
+/**
+ * @description Gets the best profession for a given time range
+ * @param {Object} query
+ * @param {Date} [query.start] - Start date
+ * @param {Date} [query.end] - End date
+ */
 app.get('/admin/best-profession', getProfile, async (req, res) => {
   const { query } = req
   const { Job } = req.app.get('models')
@@ -143,6 +158,13 @@ app.get('/admin/best-profession', getProfile, async (req, res) => {
   res.json({job})
 })
 
+/**
+ * @description List the best clients for a given time range
+ * @param {Object} query
+ * @param {Date} [query.start] - Start date
+ * @param {Date} [query.end] - End date
+ * @param {Date} [query.limit = 25] - Limit of clients to be displayed
+ */
 app.get('/admin/best-clients', getProfile, async (req, res) => {
   const {
     query

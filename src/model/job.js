@@ -32,6 +32,11 @@ class Job extends Sequelize.Model {
     Job.belongsTo(Contract)
   }
 
+  /**
+   * @description Pays for a job
+   * @returns {Promise<job>} Returns a promise that resolves with a job if the client successfully paid to the contractor
+   *  or rejects with the appropiate error
+   */
   async pay () {
     const job = this
     if (job.paid) {

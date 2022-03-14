@@ -50,6 +50,10 @@ class Profile extends Sequelize.Model {
     Profile.hasMany(Contract, {as: 'Client', foreignKey: 'ClientId'})
   }
 
+  /**
+   * @description Gets the total amount of unpaid jobs
+   * @returns {Promise<profile>} Returns the amount of unpaid jobs
+   */
   async getUnpaidJobBalance () {
     const profile = this
     const { Job } = Profile.sequelize.models
@@ -71,6 +75,13 @@ class Profile extends Sequelize.Model {
     }, 0)
   }
 
+  /**
+   * @description Deposit from a user to a client
+   * @param {number} amount Amount to be transferred
+   * @param {number} userId Target client which will receive the specified amount
+   * @returns {Promise<profile>} Returns a promise that resolves with the profile with the deducted balance
+   *  or rejects with the appropiate error
+   */
   async deposit (amount, userId) {
     const profile = this
 
