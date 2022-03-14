@@ -129,3 +129,4 @@ Thank you and good luck! 🙏
 - Add swagger apidoc
 - Split databases (creating a new one for test instead of replacing the seeded one)
 - Use .dotenv to manage the environments
+- Split app file into controllers
