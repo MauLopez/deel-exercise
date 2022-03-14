@@ -2,3 +2,6 @@ node_modules
 .DS_STORE
 database.sqlite3
 .vscode
+coverage
+.nyc_output
+reports

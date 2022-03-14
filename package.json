@@ -12,6 +12,7 @@
     "sqlite3": "^4.0.1"
   },
   "scripts": {
+    "coverage": "nyc --reporter=text-summary --reporter=lcovonly npm run test -- --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
     "start": "nodemon ./src/server.js",
     "seed": "node ./scripts/seed_db.js",
     "test": "SERVER_PORT=3002 NODE_ENV=test mocha test",
@@ -26,7 +27,11 @@
     "factory-girl": "^5.0.4",
     "factory-girl-sequelize": "^1.0.1",
     "mocha": "^9.2.2",
+    "mocha-junit-reporter": "^2.0.2",
+    "mocha-lcov-reporter": "^1.3.0",
+    "mocha-multi-reporters": "^1.5.1",
     "nodemon": "1.19.1",
+    "nyc": "^15.1.0",
     "randomstring": "^1.2.2",
     "sinon": "^13.0.1",
     "supertest": "^6.2.2"
